@@ -5,14 +5,12 @@ import com.example.api.deputados.entities.Event;
 import java.time.LocalDateTime;
 
 public record RegisterEventRequest(
-        String desc,
         LocalDateTime startedDate,
-        String descType,
-        String uri,
-        String status
-
+        LocalDateTime endedDate,
+        String status,
+        String descType
 ) {
     public RegisterEventRequest(Event event){
-        this(event.getDescription(), event.getStartedDate(), event.getDescType(), event.getUri(), event.getStatus());
+        this(event.getDataHoraInicio(), event.getDataHoraFim(), event.getSituacao(), event.getDescricaoTipo());
     }
 }

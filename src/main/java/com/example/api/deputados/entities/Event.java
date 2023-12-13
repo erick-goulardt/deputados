@@ -1,12 +1,14 @@
 package com.example.api.deputados.entities;
 
 import com.example.api.deputados.dtos.evento.RegisterEventRequest;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -15,16 +17,18 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Event {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String uri;
-    private LocalDateTime startedDate;
-    private String status;
-    private String descType;
-    private String description;
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    private LocalDateTime dataHoraInicio;
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    private LocalDateTime dataHoraFim;
+    private String situacao;
+    private String descricaoTipo;
 
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
@@ -34,11 +38,10 @@ public class Event {
     private List<Deputy> deputies;
 
     public Event(RegisterEventRequest eventRequest){
-        this.description = eventRequest.desc();
-        this.startedDate = eventRequest.startedDate();
-        this.status = eventRequest.status();
-        this.descType = eventRequest.descType();
-        this.uri = eventRequest.uri();
+        this.dataHoraInicio = eventRequest.startedDate();
+        this.dataHoraFim = eventRequest.endedDate();
+        this.situacao = eventRequest.status();
+        this.descricaoTipo = eventRequest.descType();
     }
 
 }

@@ -1,5 +1,7 @@
 package com.example.api.deputados.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,15 +15,16 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Deputy {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String name;
-    private String acronymParty;
-    private String acronymUf;
-    private Long idLegislature;
-    private String urlPhoto;
+    private String uri;
+    private String nome;
+    private String siglaPartido;
+    private String siglaUf;
+    private String urlFoto;
     private String email;
     @ManyToMany(mappedBy = "deputies", cascade = CascadeType.ALL)
     private List<Event> events;

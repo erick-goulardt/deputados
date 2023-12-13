@@ -6,6 +6,6 @@ public record ListDeputiesResponse(
         String name, String urlPhoto, String acronymParty
 ) {
     public ListDeputiesResponse(Deputy deputy) {
-        this(deputy.getName(), deputy.getUrlPhoto(), deputy.getAcronymParty());
+        this(deputy.getNome(), deputy.getUrlFoto(), deputy.getSiglaPartido());
     }
 }

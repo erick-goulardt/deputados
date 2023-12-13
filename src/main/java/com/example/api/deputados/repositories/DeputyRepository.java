@@ -8,5 +8,5 @@ import java.util.Optional;
 
 public interface DeputyRepository extends JpaRepository<Deputy, Long> {
     Optional<Deputy> findDeputyByEmail(String email);
-    Optional<List<Deputy>> findDeputiesByAcronymParty(String acronymPart);
+    Optional<List<Deputy>> findDeputiesBySiglaPartido(String siglaPartido);
 }
