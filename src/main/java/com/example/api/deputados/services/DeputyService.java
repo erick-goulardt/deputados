@@ -2,6 +2,7 @@ package com.example.api.deputados.services;
 
 import com.example.api.deputados.dtos.deputado.ListDeputiesResponse;
 import com.example.api.deputados.dtos.deputado.RegisterDeputyRequest;
+import com.example.api.deputados.dtos.deputado.RegisterOnEventRequest;
 import com.example.api.deputados.dtos.evento.ListEventResponse;
 import com.example.api.deputados.dtos.utils.LogResponse;
 import com.example.api.deputados.entities.Deputy;
@@ -12,11 +13,14 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
+import jakarta.persistence.EntityNotFoundException;
+import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,12 +35,6 @@ public class DeputyService {
     @Autowired
     private ApiService apiService;
 
-    public List<Deputy> getDeputies() {
-        return deputyRepository.findAll();
-    }
-    public Deputy insertDeputy(Deputy deputy) {
-        return deputyRepository.save(deputy);
-    }
 
     @Transactional
     @PostConstruct
@@ -75,15 +73,26 @@ public class DeputyService {
                 .collect(Collectors.toList());
     }
 
-    public LogResponse associateEvent(Long idDeputy, Long idEvent) {
-        var event = eventRepository.getReferenceById(idEvent);
-        var deputy = deputyRepository.getReferenceById(idDeputy);
-        if(deputy.getEvents().stream().anyMatch(e -> e.getId().equals(idEvent))) {
-            return new LogResponse("Não é possível vincular o mesmo evento duas vezes!");
-        } else {
-            deputy.getEvents().add(event);
-            return new LogResponse("Evento vinculado com sucesso!");
+    public LogResponse associateEvent(RegisterOnEventRequest registerData) {
+        var evento = eventRepository.findById(registerData.idEvent())
+                .orElseThrow(() -> new EntityNotFoundException("Evento não encontrado"));
+        List<Deputy> deputiesToAdd = new ArrayList<>();
+        for (Long idDeputado : registerData.idDeputies()) {
+            var deputado = deputyRepository.findById(idDeputado)
+                    .orElseThrow(() -> new EntityNotFoundException("Deputado não encontrado"));
+            deputiesToAdd.add(deputado);
         }
+        evento.getDeputies().addAll(deputiesToAdd);
+        eventRepository.save(evento);
+        deputyRepository.saveAll(deputiesToAdd);
+
+        return new LogResponse("Deputados cadastrados com sucesso no evento!");
+    }
+
+    public LogResponse deleteDeputy(Long id) {
+        var deputy = deputyRepository.getReferenceById(id);
+        deputyRepository.delete(deputy);
+        return new LogResponse("Deputado deletado!");
     }
 
     private boolean validateEntries(RegisterDeputyRequest registerDeputyRequest) {
