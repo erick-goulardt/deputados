@@ -29,9 +29,14 @@ public class EventService {
     @PostConstruct
     @Transactional
     public void saveAllFromApi() {
-        String eventData = apiService.returnEventos();
-        List<Event> eventList = convertEvents(eventData);
-        eventRepository.saveAll(eventList);
+        if (eventRepository.count() == 0) {
+            String eventData = apiService.returnEventos();
+
+            if (eventData != null && !eventData.isEmpty()) {
+                List<Event> eventList = convertEvents(eventData);
+                eventRepository.saveAll(eventList);
+            }
+        }
     }
     public LogResponse createEvent(RegisterEventRequest registerEventRequest) {
         Event event = new Event(registerEventRequest);

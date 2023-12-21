@@ -7,10 +7,11 @@ import java.time.LocalDateTime;
 public record RegisterEventRequest(
         LocalDateTime startedDate,
         LocalDateTime endedDate,
+        String description,
         String status,
         String descType
 ) {
     public RegisterEventRequest(Event event){
-        this(event.getDataHoraInicio(), event.getDataHoraFim(), event.getSituacao(), event.getDescricaoTipo());
+        this(event.getDataHoraInicio(), event.getDataHoraFim(), event.getDescricao(), event.getSituacao(), event.getDescricaoTipo());
     }
 }

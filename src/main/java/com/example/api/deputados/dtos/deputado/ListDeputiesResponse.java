@@ -3,9 +3,9 @@ package com.example.api.deputados.dtos.deputado;
 import com.example.api.deputados.entities.Deputy;
 
 public record ListDeputiesResponse(
-        String name, String urlPhoto, String acronymParty
+        Long id, String name, String urlPhoto, String acronymParty
 ) {
     public ListDeputiesResponse(Deputy deputy) {
-        this(deputy.getNome(), deputy.getUrlFoto(), deputy.getSiglaPartido());
+        this(deputy.getId(), deputy.getNome(), deputy.getUrlFoto(), deputy.getSiglaPartido());
     }
 }

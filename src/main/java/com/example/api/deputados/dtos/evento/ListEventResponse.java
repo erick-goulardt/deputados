@@ -5,11 +5,14 @@ import com.example.api.deputados.entities.Event;
 import java.time.LocalDateTime;
 
 public record ListEventResponse(
-        LocalDateTime dataFim,
-        String descType,
-        LocalDateTime dataInicio
+
+        Long id,
+        String description,
+        LocalDateTime dateInicio,
+        String situation,
+        String descType
 ) {
     public ListEventResponse (Event event){
-        this(event.getDataHoraFim(), event.getDescricaoTipo(), event.getDataHoraInicio());
+        this(event.getId(), event.getDescricao(), event.getDataHoraInicio() ,event.getSituacao(), event.getDescricaoTipo());
     }
 }

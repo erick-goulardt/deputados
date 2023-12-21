@@ -29,16 +29,19 @@ public class Event {
     private LocalDateTime dataHoraFim;
     private String situacao;
     private String descricaoTipo;
+    @Column(columnDefinition = "LONGTEXT")
+    private String descricao;
 
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
             name = "deputy_event",
-            joinColumns = @JoinColumn(name = "deputy_id"),
-            inverseJoinColumns = @JoinColumn(name = "event_id"))
+            joinColumns = @JoinColumn(name = "event_id"),
+            inverseJoinColumns = @JoinColumn(name = "deputy_id"))
     private List<Deputy> deputies;
 
     public Event(RegisterEventRequest eventRequest){
         this.dataHoraInicio = eventRequest.startedDate();
+        this.descricao = eventRequest.description();
         this.dataHoraFim = eventRequest.endedDate();
         this.situacao = eventRequest.status();
         this.descricaoTipo = eventRequest.descType();

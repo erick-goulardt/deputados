@@ -34,14 +34,17 @@ public class DeputyService {
     private EventRepository eventRepository;
     @Autowired
     private ApiService apiService;
-
-
     @Transactional
     @PostConstruct
-    public void saveAlLFromApi() {
-        String deputyData = apiService.returnDeputados();
-        List<Deputy> deputyList = convertDeputy(deputyData);
-        deputyRepository.saveAll(deputyList);
+    public void saveAllFromApi() {
+        if (deputyRepository.count() == 0) {
+            String deputyData = apiService.returnDeputados();
+
+            if (deputyData != null && !deputyData.isEmpty()) {
+                List<Deputy> deputyList = convertDeputy(deputyData);
+                deputyRepository.saveAll(deputyList);
+            }
+        }
     }
 
     public LogResponse registerDeputy(RegisterDeputyRequest registerDeputyRequest) {
@@ -73,26 +76,35 @@ public class DeputyService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public LogResponse associateEvent(RegisterOnEventRequest registerData) {
-        var evento = eventRepository.findById(registerData.idEvent())
+        var eventId = registerData.idEvent();
+        var deputadoId = registerData.idDeputy();
+        var evento = eventRepository.findById(eventId)
                 .orElseThrow(() -> new EntityNotFoundException("Evento não encontrado"));
-        List<Deputy> deputiesToAdd = new ArrayList<>();
-        for (Long idDeputado : registerData.idDeputies()) {
-            var deputado = deputyRepository.findById(idDeputado)
-                    .orElseThrow(() -> new EntityNotFoundException("Deputado não encontrado"));
-            deputiesToAdd.add(deputado);
+        var deputado = deputyRepository.findById(deputadoId)
+                .orElseThrow(() -> new EntityNotFoundException("Deputado não encontrado"));
+        if (evento.getDeputies().contains(deputado) || deputado.getEvents().contains(evento)) {
+            return new LogResponse("O deputado já está associado a este evento.");
         }
-        evento.getDeputies().addAll(deputiesToAdd);
+        evento.getDeputies().add(deputado);
+        deputado.getEvents().add(evento);
         eventRepository.save(evento);
-        deputyRepository.saveAll(deputiesToAdd);
-
-        return new LogResponse("Deputados cadastrados com sucesso no evento!");
+        deputyRepository.save(deputado);
+        return new LogResponse("Deputado cadastrado com sucesso no evento!");
     }
 
     public LogResponse deleteDeputy(Long id) {
         var deputy = deputyRepository.getReferenceById(id);
         deputyRepository.delete(deputy);
         return new LogResponse("Deputado deletado!");
+    }
+
+    public List<ListDeputiesResponse> showDeputiesOnEvent(Long id) {
+        var event = eventRepository.getReferenceById(id);
+        var deputyList = event.getDeputies();
+        return deputyList.stream().map(ListDeputiesResponse::new)
+                .collect(Collectors.toList());
     }
 
     private boolean validateEntries(RegisterDeputyRequest registerDeputyRequest) {

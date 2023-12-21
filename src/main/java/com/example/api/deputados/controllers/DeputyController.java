@@ -3,6 +3,7 @@ package com.example.api.deputados.controllers;
 import com.example.api.deputados.dtos.deputado.ListDeputiesResponse;
 import com.example.api.deputados.dtos.deputado.RegisterDeputyRequest;
 import com.example.api.deputados.dtos.deputado.RegisterOnEventRequest;
+import com.example.api.deputados.dtos.evento.ListEventResponse;
 import com.example.api.deputados.dtos.utils.LogResponse;
 import com.example.api.deputados.services.DeputyService;
 import jakarta.transaction.Transactional;
@@ -38,10 +39,17 @@ public class DeputyController {
         return ResponseEntity.ok().body(response);
     }
 
+    @GetMapping("/evento/{id}")
+    public ResponseEntity<List<ListDeputiesResponse>> showDeputiesOnEvent(@PathVariable Long id) {
+        var response = deputyService.showDeputiesOnEvent(id);
+        return ResponseEntity.ok().body(response);
+    }
+
     @DeleteMapping("/excluir/{id}")
     public ResponseEntity<LogResponse> deleteDeputy(@PathVariable Long id) {
         var response = deputyService.deleteDeputy(id);
         return ResponseEntity.ok().body(response);
     }
+
 }
 
